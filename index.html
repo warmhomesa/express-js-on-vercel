@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>شعلة التدفئة | إدارة العمل</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    body{font-family:Tajawal,system-ui,sans-serif;background:#f8fafc;color:#0f172a;overflow-x:hidden}
+    .glass{background:rgba(255,255,255,.92);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.7);box-shadow:0 16px 50px rgba(15,23,42,.08)}
+    .shape{position:fixed;border-radius:999px;filter:blur(90px);opacity:.45;z-index:-1;animation:pulse 12s infinite alternate}.s1{top:-130px;right:-120px;width:440px;height:440px;background:#fde68a}.s2{bottom:-150px;left:-130px;width:520px;height:520px;background:#bae6fd;animation-delay:-5s}@keyframes pulse{to{transform:scale(1.08) translate(25px,20px)}}
+    .tab{display:none}.tab.active{display:block}.nav.active{background:#f59e0b;color:white;box-shadow:0 10px 24px rgba(245,158,11,.35)}
+  </style>
+</head>
+<body class="min-h-screen">
+  <div class="shape s1"></div><div class="shape s2"></div>
+
+  <section id="public" class="block">
+    <header class="glass sticky top-0 z-40 border-b">
+      <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
+        <div class="flex items-center gap-3"><div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 grid place-items-center text-2xl shadow-lg">🔥</div><div><h1 class="text-xl font-black">شعلة التدفئة</h1><p class="text-[11px] font-bold text-amber-600 tracking-widest">للرفاهية الهندسية</p></div></div>
+        <div class="flex gap-2"><button onclick="openLogin()" class="px-5 py-2.5 rounded-full bg-slate-100 border text-sm font-extrabold">🔒 الإدارة</button><a href="https://wa.me/" class="hidden md:block px-6 py-2.5 rounded-full bg-slate-900 text-white text-sm font-extrabold hover:bg-amber-500 hover:text-slate-900">💬 تواصل معنا</a></div>
+      </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 py-12">
+      <section class="text-center mb-14">
+        <span class="inline-block px-4 py-1.5 rounded-full bg-amber-100 text-amber-800 text-xs font-black border border-amber-200">خبرة هندسية منذ 2009</span>
+        <h2 class="mt-5 text-4xl md:text-6xl font-black leading-tight">إدارة وتنفيذ مشاريع <span class="text-amber-500">التدفئة والمسابح</span></h2>
+        <p class="mt-5 max-w-2xl mx-auto text-slate-600 text-lg leading-relaxed">منظومة عمل ذكية تجمع واجهة العملاء، لوحة القيادة، متابعة الخدمات، وأدوات صياغة ميدانية مخصصة لشعلة التدفئة.</p>
+      </section>
+
+      <section class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
+        <div class="glass p-6 rounded-3xl text-center"><div class="text-3xl mb-2">🏗️</div><b class="text-3xl" data-count="1500">0</b><p class="text-xs font-bold text-slate-500">مشروع منجز</p></div>
+        <div class="glass p-6 rounded-3xl text-center"><div class="text-3xl mb-2">⭐</div><b class="text-3xl" data-count="98">0</b><span class="text-3xl font-black">%</span><p class="text-xs font-bold text-slate-500">رضا العملاء</p></div>
+        <div class="glass p-6 rounded-3xl text-center"><div class="text-3xl mb-2">👨‍🔧</div><b class="text-3xl" data-count="45">0</b><p class="text-xs font-bold text-slate-500">خبير وفني</p></div>
+        <div class="glass p-6 rounded-3xl text-center"><div class="text-3xl mb-2">🛡️</div><b class="text-3xl" data-count="10">0</b><p class="text-xs font-bold text-slate-500">سنوات ضمان</p></div>
+      </section>
+
+      <section class="grid lg:grid-cols-2 gap-8">
+        <div class="glass p-8 rounded-[32px]"><h3 class="text-2xl font-black mb-2">توزيع الخدمات</h3><p class="text-sm text-slate-500 mb-6">قراءة سريعة لتوزيع أعمال المؤسسة.</p><div class="h-80"><canvas id="servicesChart"></canvas></div></div>
+        <div class="grid sm:grid-cols-2 gap-4">
+          <article class="glass p-6 rounded-3xl border-t-4 border-amber-500"><div class="text-4xl mb-3">🔥</div><h3 class="font-black text-lg">التدفئة تحت البلاط</h3><p class="text-sm text-slate-600 leading-relaxed mt-2">أنظمة ديزل، تحكم ترموستات، أمان للأطفال، وتنفيذ ميداني مضبوط.</p></article>
+          <article class="glass p-6 rounded-3xl border-t-4 border-sky-500"><div class="text-4xl mb-3">🏊‍♂️</div><h3 class="font-black text-lg">المسابح الخرسانية</h3><p class="text-sm text-slate-600 leading-relaxed mt-2">تصميم وتنفيذ من الحفر حتى التشغيل مع عزل وفلترة.</p></article>
+          <article class="glass p-6 rounded-3xl border-t-4 border-emerald-500"><div class="text-4xl mb-3">⛲</div><h3 class="font-black text-lg">النوافير والشلالات</h3><p class="text-sm text-slate-600 leading-relaxed mt-2">ضخ مخفي، إضاءة مائية، وتصاميم جدارية حديثة.</p></article>
+          <article class="glass p-6 rounded-3xl border-t-4 border-purple-500"><div class="text-4xl mb-3">🧖‍♂️</div><h3 class="font-black text-lg">الساونا والبخار</h3><p class="text-sm text-slate-600 leading-relaxed mt-2">غرف استجمام منزلية بمواد مختارة ولوحات تحكم.</p></article>
+        </div>
+      </section>
+    </main>
+  </section>
+
+  <div id="login" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 grid place-items-center p-4">
+    <div class="bg-white w-full max-w-sm rounded-3xl p-8 shadow-2xl text-center relative"><button onclick="closeLogin()" class="absolute top-4 left-4 text-xl font-bold text-slate-400">×</button><div class="mx-auto w-16 h-16 rounded-full bg-slate-100 grid place-items-center text-2xl mb-4">🔒</div><h3 class="text-xl font-black mb-5">بوابة الإدارة</h3><input id="uid" dir="ltr" class="w-full p-3 rounded-xl bg-slate-50 border mb-3 text-left" placeholder="HT-1001"><input id="pass" type="password" dir="ltr" class="w-full p-3 rounded-xl bg-slate-50 border mb-5 text-left" placeholder="Admin99"><button onclick="login()" class="w-full py-3 rounded-xl bg-slate-900 text-white font-black hover:bg-amber-500 hover:text-slate-900">دخول</button><p id="loginErr" class="hidden mt-3 text-xs font-black text-red-600">بيانات الدخول غير صحيحة</p></div>
+  </div>
+
+  <section id="dashboard" class="hidden pb-16">
+    <nav class="glass sticky top-0 z-40 border-b mb-8">
+      <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-3"><div class="text-3xl bg-amber-100 p-2 rounded-xl">🔥</div><div><h1 class="text-2xl font-black">شعلة التدفئة</h1><p class="text-xs text-amber-600 font-black tracking-widest">المركز القيادي - إدارة العمل</p></div></div>
+        <div class="flex gap-2 overflow-x-auto max-w-full"><button id="n-overview" onclick="tab('overview')" class="nav active px-5 py-2 rounded-full text-sm font-black">📊 الأداء</button><button id="n-services" onclick="tab('services')" class="nav px-5 py-2 rounded-full text-sm font-black bg-slate-100">🎯 الخدمات</button><button id="n-tools" onclick="tab('tools')" class="nav px-5 py-2 rounded-full text-sm font-black bg-slate-100">✨ الأدوات</button><button onclick="logout()" class="px-4 py-2 rounded-full text-sm font-black bg-red-50 text-red-600">خروج</button></div>
+      </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-4">
+      <div id="overview" class="tab active">
+        <div class="bg-slate-900 text-white p-6 rounded-3xl mb-8 flex flex-col md:flex-row justify-between gap-4"><div><h2 class="text-xl font-black">👋 أهلاً أستاذ أحمد</h2><p class="text-slate-400 text-sm">ملخص سريع لمشاريع أبها وخميس مشيط ومتابعة فريق العمل.</p></div><div class="px-4 py-2 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold text-sm">● النظام الميداني متصل</div></div>
+        <div class="grid md:grid-cols-3 gap-5 mb-8"><div class="glass p-6 rounded-3xl text-center border-t-4 border-sky-500"><div class="text-4xl">🏗️</div><b class="text-4xl" data-count="24">0</b><p class="font-bold text-slate-500 text-sm">مشاريع نشطة</p></div><div class="glass p-6 rounded-3xl text-center border-t-4 border-emerald-500"><div class="text-4xl">🤝</div><b class="text-4xl" data-count="12">0</b><p class="font-bold text-slate-500 text-sm">عروض مبيعات</p></div><div class="glass p-6 rounded-3xl text-center border-t-4 border-amber-500"><div class="text-4xl">⚠️</div><b class="text-4xl text-red-600" data-count="3">0</b><p class="font-bold text-slate-500 text-sm">تنبيهات فنية</p></div></div>
+        <div class="glass p-8 rounded-3xl"><h3 class="text-xl font-black mb-4">📈 اتجاه الطلب</h3><div class="h-80"><canvas id="demandChart"></canvas></div></div>
+      </div>
+
+      <div id="services" class="tab">
+        <div class="grid lg:grid-cols-3 gap-8"><div class="space-y-3"><h3 class="font-black text-slate-400 tracking-widest text-xs">الخدمات الميدانية</h3><button onclick="service('heating')" class="svc w-full text-right p-4 rounded-2xl bg-amber-50 border-2 border-amber-500 font-black">🔥 التدفئة المركزية</button><button onclick="service('pools')" class="svc w-full text-right p-4 rounded-2xl bg-white border font-black">🏊‍♂️ المسابح الخرسانية</button><button onclick="service('fountains')" class="svc w-full text-right p-4 rounded-2xl bg-white border font-black">⛲ النوافير والشلالات</button><div class="bg-slate-900 text-white p-6 rounded-2xl mt-6"><h4 class="text-amber-400 font-black text-xs mb-2">💡 قراءة تنفيذية</h4><p id="insight" class="text-sm text-slate-300 leading-relaxed">التدفئة المركزية تحقق أعلى طلب في موسم الشتاء، والأولوية لتسريع المعاينات والعقود.</p></div></div><div class="lg:col-span-2 glass p-8 rounded-3xl"><h3 id="svcTitle" class="text-2xl text-center font-black mb-6">مؤشرات: التدفئة المركزية</h3><div class="h-80"><canvas id="polarChart"></canvas></div></div></div>
+      </div>
+
+      <div id="tools" class="tab">
+        <div class="mb-6 p-5 rounded-2xl bg-amber-50 border border-amber-200 flex gap-4"><span class="text-3xl">🤖</span><div><h3 class="font-black text-amber-900">أدوات العمل الذكية</h3><p class="text-sm text-amber-700">نسخة ويب مبدئية: تصيغ مسودات فورية محلية، ويمكن لاحقاً ربطها بـ Gemini API عبر خادم آمن.</p></div></div>
+        <div class="grid lg:grid-cols-2 gap-6" id="toolGrid"></div>
+      </div>
+    </main>
+  </section>
+
+  <script>
+    const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+    function count(){ $$('[data-count]').forEach(e=>{let t=+e.dataset.count,c=0,inc=Math.max(1,t/40);function u(){c+=inc;if(c<t){e.textContent=Math.ceil(c);requestAnimationFrame(u)}else e.textContent=t}u()}) }
+    function openLogin(){$('#login').classList.remove('hidden')} function closeLogin(){$('#login').classList.add('hidden')}
+    function login(){ if($('#uid').value.trim()==='HT-1001' && $('#pass').value.trim()==='Admin99'){closeLogin();$('#public').classList.add('hidden');$('#dashboard').classList.remove('hidden');setTimeout(initDash,50)}else $('#loginErr').classList.remove('hidden') }
+    function logout(){ $('#dashboard').classList.add('hidden');$('#public').classList.remove('hidden') }
+    function tab(id){ $$('.tab').forEach(x=>x.classList.remove('active')); $('#'+id).classList.add('active'); $$('.nav').forEach(x=>x.classList.remove('active')); $('#n-'+id).classList.add('active') }
+    Chart.defaults.font.family='Tajawal';
+    new Chart($('#servicesChart'),{type:'doughnut',data:{labels:['التدفئة','المسابح','النوافير','الساونا'],datasets:[{data:[45,30,15,10],backgroundColor:['#f59e0b','#0ea5e9','#10b981','#a855f7'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}}}});
+    let made=false,polar; const data={heating:{title:'التدفئة المركزية',v:[95,85,60,90],txt:'التدفئة المركزية تحقق طلباً عالياً وربحية جيدة؛ المطلوب متابعة سرعة التنفيذ وتقليل التأخير في المواقع.'},pools:{title:'المسابح الخرسانية',v:[80,75,70,95],txt:'المسابح قوية في رضا العملاء، والأولوية لتوثيق مراحل العزل والفلترة بالصور لرفع ثقة العميل.'},fountains:{title:'النوافير والشلالات',v:[60,65,85,80],txt:'النوافير سريعة التنفيذ وتناسب الحملات المرئية؛ الأفضل تسويقها كباقة ترقية مع المسابح.'}};
+    function initDash(){count(); if(made)return; made=true; new Chart($('#demandChart'),{type:'line',data:{labels:['يناير','فبراير','مارس','أبريل','مايو','يونيو'],datasets:[{label:'التدفئة',data:[12,19,25,32,28,15],borderColor:'#f59e0b',backgroundColor:'rgba(245,158,11,.18)',fill:true,tension:.4},{label:'المسابح',data:[5,8,12,20,35,42],borderColor:'#0ea5e9',backgroundColor:'rgba(14,165,233,.18)',fill:true,tension:.4}]},options:{responsive:true,maintainAspectRatio:false}}); polar=new Chart($('#polarChart'),{type:'polarArea',data:{labels:['حجم الطلب','الربحية','سرعة التنفيذ','رضا العملاء'],datasets:[{data:data.heating.v,backgroundColor:['rgba(245,158,11,.75)','rgba(245,158,11,.55)','rgba(245,158,11,.35)','rgba(245,158,11,.9)']}]},options:{responsive:true,maintainAspectRatio:false,scales:{r:{ticks:{display:false}}}}}); }
+    function service(k){ const d=data[k]; $('#svcTitle').textContent='مؤشرات: '+d.title; $('#insight').textContent=d.txt; polar.data.datasets[0].data=d.v; polar.update(); $$('.svc').forEach(b=>b.className='svc w-full text-right p-4 rounded-2xl bg-white border font-black'); event.currentTarget.className='svc w-full text-right p-4 rounded-2xl bg-amber-50 border-2 border-amber-500 font-black' }
+    const tools=[['✍️','صائغ عروض الأسعار','اكتب اسم العميل والخدمة','عرض سعر أولي'],['😠','محلل شكاوى العملاء','الصق شكوى العميل','رد تهدئة احترافي'],['🛠️','المستشار الفني','صف المشكلة الفنية','خطوات حل ميدانية'],['💰','تقدير التكاليف','صف المشروع والمساحة','تقدير بنود وتوجيه'],['🎙️','ملخص الاجتماعات','الصق ملاحظات الاجتماع','مهام موزعة'],['📱','صانع محتوى تسويقي','صف المشروع المنجز','منشور تسويقي'],['🦺','مفتش السلامة','صف مخاطر الموقع','خطة سلامة'],['♻️','إعادة استهداف الصيانة','بيانات العميل السابق','رسالة صيانة']];
+    $('#toolGrid').innerHTML=tools.map((t,i)=>`<div class="glass p-6 rounded-3xl border-t-4 border-amber-500"><h3 class="font-black text-lg mb-2">${t[0]} ${t[1]}</h3><p class="text-sm text-slate-500 mb-4">${t[3]}</p><textarea id="in${i}" class="w-full h-24 p-3 rounded-xl bg-slate-50 border text-sm" placeholder="${t[2]}"></textarea><button onclick="gen(${i})" class="mt-3 w-full bg-slate-900 text-white py-3 rounded-xl font-black hover:bg-amber-500 hover:text-slate-900">✨ توليد المسودة</button><textarea id="out${i}" readonly class="hidden mt-3 w-full h-32 p-3 rounded-xl bg-slate-50 border text-sm"></textarea></div>`).join('');
+    function gen(i){let v=$('#in'+i).value.trim()||'لا توجد تفاصيل كافية'; let out=$('#out'+i); out.classList.remove('hidden'); out.value=`${tools[i][3]}\n\nالمعطيات: ${v}\n\nمسودة مقترحة من شعلة التدفئة:\nنشكركم على ثقتكم. بناءً على التفاصيل المذكورة، نوصي بتحديد معاينة ميدانية لضبط المواصفات، حساب المواد، وتحديد جدول تنفيذ واضح مع الالتزام بمعايير السلامة والجودة والضمان.`}
+    count();
+  </script>
+</body>
+</html>
