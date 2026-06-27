@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>شعلة التدفئة | المنظومة الشاملة والذكية</title>
+    
+    <!-- مكتبات التصميم والرسوم البيانية الأساسية -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: #f8fafc;
+            color: #0f172a;
+            overflow-x: hidden;
+        }
+        
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            height: 320px;
+        }
+
+        @media (min-width: 1024px) {
+            .chart-container { height: 380px; max-height: 400px; }
+        }
+
+        /* رسومات الخلفية المتحركة */
+        .bg-shape {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: -1;
+            opacity: 0.5;
+            animation: pulse 12s infinite alternate;
+        }
+        .shape-1 { top: -100px; right: -100px; width: 450px; height: 450px; background: #fde68a; } 
+        .shape-2 { bottom: -100px; left: -100px; width: 550px; height: 550px; background: #e0f2fe; animation-delay: -6s; } 
+
+        @keyframes pulse {
+            0% { transform: scale(1) translate(0, 0); }
+            100% { transform: scale(1.05) translate(20px, 20px); }
+        }
+
+        .custom-scrollbar::-webkit-scrollbar { width: 5px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 5px; }
+
+        /* Dashboard Styles */
+        .nav-btn { transition: all 0.3s ease; }
+        .nav-btn.active {
+            background-color: #f59e0b; 
+            color: white;
+            box-shadow: 0 4px 14px 0 rgba(245, 158, 11, 0.4);
+        }
+        .tab-content { display: none; opacity: 0; transform: translateY(15px); transition: opacity 0.4s ease, transform 0.4s ease; }
+        .tab-content.active { display: block; opacity: 1; transform: translateY(0); }
+    </style>
+</head>
+<body class="relative min-h-screen">
+
+    <!-- أشكال الخلفية المشتركة -->
+    <div class="bg-shape shape-1 fixed pointer-events-none"></div>
+    <div class="bg-shape shape-2 fixed pointer-events-none"></div>
+
+    <!-- ========================================================================= -->
+    <!-- 1. واجهة العملاء العامة (Public View) -->
+    <!-- ========================================================================= -->
+    <div id="public-view" class="transition-all duration-500 block">
+        <!-- الشريط العلوي -->
+        <header class="glass-panel sticky top-0 z-50 border-b border-slate-200">
+            <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <div class="bg-gradient-to-br from-amber-400 to-orange-500 text-white w-12 h-12 rounded-xl flex items-center justify-center text-2xl shadow-lg">🔥</div>
+                    <div>
+                        <h1 class="text-xl font-black text-slate-800 tracking-tight">شعلة التدفئة</h1>
+                        <p class="text-[10px] text-amber-600 font-bold uppercase tracking-widest">للرفاهية الهندسية</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button onclick="document.getElementById('login-modal').classList.remove('hidden')" class="bg-slate-100 text-slate-600 px-4 py-2.5 rounded-full text-xs font-bold hover:bg-slate-200 transition-all shadow-sm flex items-center gap-2 border border-slate-200">
+                        🔒 الإدارة
+                    </button>
+                    <a href="https://wa.me/" target="_blank" class="hidden md:flex bg-slate-900 text-white px-6 py-2.5 rounded-full text-sm font-bold hover:bg-amber-500 hover:text-slate-900 transition-all shadow-md items-center gap-2">
+                        💬 تواصل معنا
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <main class="max-w-7xl mx-auto px-4 py-12">
+            <!-- قسم الترحيب -->
+            <section class="text-center mb-16">
+                <span class="bg-amber-100 text-amber-800 px-4 py-1.5 rounded-full text-xs font-bold mb-4 inline-block border border-amber-200">خبرة هندسية منذ عام 2009</span>
+                <h2 class="text-4xl md:text-6xl font-black text-slate-900 mb-6 leading-tight">هندسة تفوق <span class="text-amber-500">التوقعات</span></h2>
+                <p class="text-slate-600 max-w-2xl mx-auto text-lg leading-relaxed mb-10">نؤسس بيئات أكثر دفئاً لعائلتك بأرقى المعايير المائية والحرارية المعتمدة للمسابح والتدفئة المركزية.</p>
+                
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 max-w-4xl mx-auto">
+                    <div class="glass-panel p-6 rounded-3xl text-center"><div class="text-3xl mb-2">🏗️</div><div class="text-3xl font-black text-slate-800 mb-1">+<span class="pub-counter" id="val-completed" data-target="1500">0</span></div><div class="text-xs font-bold text-slate-500">مشروع منجز</div></div>
+                    <div class="glass-panel p-6 rounded-3xl text-center"><div class="text-3xl mb-2">⭐</div><div class="text-3xl font-black text-slate-800 mb-1"><span class="pub-counter" id="val-satisfaction" data-target="98">0</span>%</div><div class="text-xs font-bold text-slate-500">رضا العملاء</div></div>
+                    <div class="glass-panel p-6 rounded-3xl text-center"><div class="text-3xl mb-2">👨‍🔧</div><div class="text-3xl font-black text-slate-800 mb-1">+<span class="pub-counter" id="val-experts" data-target="45">0</span></div><div class="text-xs font-bold text-slate-500">خبير وفني</div></div>
+                    <div class="glass-panel p-6 rounded-3xl text-center"><div class="text-3xl mb-2">🛡️</div><div class="text-3xl font-black text-slate-800 mb-1"><span class="pub-counter" id="val-warranty" data-target="10">0</span></div><div class="text-xs font-bold text-slate-500">سنوات ضمان</div></div>
+                </div>
+            </section>
+
+            <!-- الخدمات والشارت -->
+            <section class="grid grid-cols-1 lg:grid-cols-2 gap-10 mb-16">
+                <div class="glass-panel p-8 rounded-[40px]">
+                    <h3 class="text-2xl font-bold text-slate-800 mb-2">توزيع مشاريعنا</h3>
+                    <p class="text-sm text-slate-500 mb-8">نسبة تنفيذ الخدمات في الفلل والقصور بالمنطقة الجنوبية</p>
+                    <div class="chart-container"><canvas id="publicServicesChart"></canvas></div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="glass-panel p-6 rounded-3xl border-t-4 border-amber-500"><div class="text-4xl mb-4">🔥</div><h4 class="font-bold text-lg text-slate-800 mb-2">التدفئة المركزية</h4><p class="text-sm text-slate-600 leading-relaxed">أنظمة ديزل آمنة واقتصادية لتدفئة متكاملة تحت البلاط.</p></div>
+                    <div class="glass-panel p-6 rounded-3xl border-t-4 border-sky-500"><div class="text-4xl mb-4">🏊‍♂️</div><h4 class="font-bold text-lg text-slate-800 mb-2">المسابح الخرسانية</h4><p class="text-sm text-slate-600 leading-relaxed">تنفيذ خرساني مسلح قوي (لا نستخدم الفايبرجلاس).</p></div>
+                    <div class="glass-panel p-6 rounded-3xl border-t-4 border-emerald-500"><div class="text-4xl mb-4">⛲</div><h4 class="font-bold text-lg text-slate-800 mb-2">الشلالات والنوافير</h4><p class="text-sm text-slate-600 leading-relaxed">تصاميم جدارية ومائية فريدة وعزل أمريكي معتمد.</p></div>
+                    <div class="glass-panel p-6 rounded-3xl border-t-4 border-purple-500"><div class="text-4xl mb-4">🧖‍♂️</div><h4 class="font-bold text-lg text-slate-800 mb-2">الساونا والبخار</h4><p class="text-sm text-slate-600 leading-relaxed">تجهيز غرف استشفاء منزلية بأرقى أنواع الأخشاب.</p></div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="bg-slate-900 text-slate-400 py-10 text-center border-t border-slate-800">
+            <div class="text-2xl mb-4">🔥</div><p class="font-bold text-white mb-2">مؤسسة شعلة التدفئة للمقاولات</p>
+            <p class="text-sm mb-4">أبها وخميس مشيط - المملكة العربية السعودية</p>
+        </footer>
+
+        <!-- Public AI Chat -->
+        <div class="fixed bottom-6 left-6 z-40 flex flex-col items-start">
+            <div id="pub-chat-window" class="hidden glass-panel shadow-2xl rounded-[30px] w-[320px] md:w-[380px] h-[450px] mb-4 flex flex-col overflow-hidden transition-all duration-300">
+                <div class="bg-gradient-to-r from-amber-500 to-amber-600 p-4 text-slate-900 flex justify-between items-center">
+                    <span class="font-bold text-sm">🤖 مستشار العملاء الذكي</span>
+                    <button onclick="document.getElementById('pub-chat-window').classList.add('hidden')" class="hover:text-white font-bold">✕</button>
+                </div>
+                <div id="pub-chat-messages" class="flex-1 p-4 overflow-y-auto flex flex-col gap-4 bg-slate-50/50 custom-scrollbar">
+                    <div class="bg-white border border-slate-200 text-slate-800 p-4 rounded-2xl rounded-tr-none text-sm w-[90%] self-start shadow-sm leading-relaxed">أهلاً بك في "شعلة التدفئة" 🔥.<br>أنا المساعد الآلي، تفضل بسؤالي عن خدماتنا، أسعارنا التقديرية، أو تفاصيل تنفيذ المسابح والتدفئة!</div>
+                </div>
+                <div class="p-3 bg-white border-t border-slate-100 flex gap-2">
+                    <input type="text" id="pub-chat-input" placeholder="اكتب سؤالك هنا..." class="flex-1 bg-slate-100 px-3 py-2 rounded-lg text-sm outline-none" onkeypress="if(event.key === 'Enter') sendPubMsg()">
+                    <button onclick="sendPubMsg()" id="btn-pub-send" class="bg-slate-900 text-white px-4 py-2 rounded-lg font-bold text-xs">إرسال</button>
+                </div>
+            </div>
+            <button onclick="document.getElementById('pub-chat-window').classList.toggle('hidden')" class="bg-slate-900 text-white w-14 h-14 rounded-full shadow-2xl hover:bg-amber-500 hover:text-slate-900 transition-all border-2 border-white/50 text-2xl flex justify-center items-center">💬</button>
+        </div>
+    </div>
+
+
+    <!-- ========================================================================= -->
+    <!-- 2. نافذة تسجيل الدخول ونافذة إعدادات الأرقام الفعلية -->
+    <!-- ========================================================================= -->
+    <div id="login-modal" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4 z-[999]">
+        <div class="bg-white p-8 md:p-10 rounded-3xl w-full max-w-sm text-center relative shadow-2xl border border-slate-200">
+            <button onclick="document.getElementById('login-modal').classList.add('hidden')" class="absolute top-4 left-4 text-slate-400 hover:text-slate-800 text-xl font-bold">✕</button>
+            <div class="bg-slate-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-600 text-2xl">🔒</div>
+            <h3 class="text-xl font-bold mb-6 text-slate-800">بوابة الإدارة</h3>
+            <input type="text" id="login-id" placeholder="الرقم الوظيفي (HT-1001)" class="w-full border border-slate-200 p-3 rounded-xl mb-3 text-sm outline-none focus:border-amber-400 bg-slate-50 text-left" dir="ltr">
+            <input type="password" id="login-pass" placeholder="كلمة المرور (Admin99)" class="w-full border border-slate-200 p-3 rounded-xl mb-6 text-sm outline-none focus:border-amber-400 bg-slate-50 text-left" dir="ltr">
+            <button onclick="attemptLogin()" class="w-full bg-slate-900 text-white py-3 rounded-xl font-bold hover:bg-amber-500 hover:text-slate-900 transition-colors">تسجيل الدخول</button>
+            <p id="login-error" class="text-red-500 text-xs font-bold mt-3 hidden">بيانات الدخول غير صحيحة!</p>
+        </div>
+    </div>
+
+    <!-- نافذة إعدادات الأرقام الفعلية -->
+    <div id="settings-modal" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4 z-[999]">
+        <div class="bg-white p-8 md:p-10 rounded-3xl w-full max-w-sm text-right relative shadow-2xl border border-slate-200">
+            <button onclick="document.getElementById('settings-modal').classList.add('hidden')" class="absolute top-4 left-4 text-slate-400 hover:text-slate-800 text-xl font-bold">✕</button>
+            <h3 class="text-xl font-bold mb-6 text-slate-800 flex items-center gap-2">⚙️ الأرقام الفعلية للمؤسسة</h3>
+            <p class="text-xs text-slate-500 mb-6 font-bold">أدخل الأرقام الحقيقية هنا وسيقوم النظام بتحديث واجهة العملاء ولوحة القيادة فوراً.</p>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="text-xs font-bold text-gray-500">إجمالي المشاريع المنجزة</label>
+                    <input type="number" id="inp-completed" class="w-full border border-slate-200 p-3 rounded-xl mt-1 text-sm bg-slate-50 outline-none focus:border-amber-500" />
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-gray-500">عدد الفنيين والخبراء</label>
+                    <input type="number" id="inp-experts" class="w-full border border-slate-200 p-3 rounded-xl mt-1 text-sm bg-slate-50 outline-none focus:border-amber-500" />
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-gray-500">المشاريع النشطة حالياً (في الميدان)</label>
+                    <input type="number" id="inp-active" class="w-full border border-slate-200 p-3 rounded-xl mt-1 text-sm bg-slate-50 outline-none focus:border-amber-500" />
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-gray-500">نسبة رضا العملاء (%)</label>
+                    <input type="number" id="inp-satisfaction" class="w-full border border-slate-200 p-3 rounded-xl mt-1 text-sm bg-slate-50 outline-none focus:border-amber-500" />
+                </div>
+            </div>
+            
+            <button onclick="saveActualNumbers()" class="w-full bg-amber-500 text-slate-900 py-3 rounded-xl font-bold hover:bg-amber-600 transition-colors mt-8 shadow-md">حفظ وتحديث الواجهة</button>
+        </div>
+    </div>
+
+
+    <!-- ========================================================================= -->
+    <!-- 3. لوحة القيادة الإدارية (Dashboard View) -->
+    <!-- ========================================================================= -->
+    <div id="dashboard-view" class="hidden transition-all duration-500 pb-20">
+        <nav class="glass-panel sticky top-0 z-50 px-6 py-4 mb-8 border-b border-slate-200">
+            <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="text-3xl bg-amber-100 p-2 rounded-xl">🔥</div>
+                    <div>
+                        <h1 class="text-2xl font-black text-slate-800 tracking-tight">شعلة التدفئة</h1>
+                        <p class="text-xs text-amber-600 font-bold tracking-widest uppercase">المركز القيادي - سير العمل</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4 overflow-x-auto custom-scrollbar pb-2 md:pb-0 w-full md:w-auto">
+                    <div class="flex gap-2 bg-slate-100 p-1.5 rounded-full whitespace-nowrap">
+                        <button onclick="switchDashTab('overview')" id="btn-overview" class="nav-btn active px-5 py-2 rounded-full text-sm font-bold text-slate-600">📊 الأداء</button>
+                        <button onclick="switchDashTab('services')" id="btn-services" class="nav-btn px-5 py-2 rounded-full text-sm font-bold text-slate-600">🎯 الخدمات</button>
+                        <button onclick="switchDashTab('ai-tools')" id="btn-ai-tools" class="nav-btn px-5 py-2 rounded-full text-sm font-bold text-slate-600">✨ المساعد الذكي</button>
+                    </div>
+                    <!-- زر إعدادات الأرقام الفعلية -->
+                    <button onclick="document.getElementById('settings-modal').classList.remove('hidden')" class="bg-white text-slate-600 px-4 py-2 rounded-full text-xs font-bold hover:bg-slate-200 transition-all border border-slate-200 shadow-sm whitespace-nowrap">⚙️ الأرقام الفعلية</button>
+                    <button onclick="logout()" class="bg-red-50 text-red-600 px-4 py-2 rounded-full text-xs font-bold hover:bg-red-600 hover:text-white transition-all border border-red-200 whitespace-nowrap">خروج</button>
+                </div>
+            </div>
+        </nav>
+
+        <main class="max-w-7xl mx-auto px-4 sm:px-6">
+            <section id="overview" class="tab-content active">
+                <div class="bg-slate-900 text-white p-6 rounded-3xl mb-8 flex flex-col md:flex-row justify-between items-center gap-4 shadow-xl">
+                    <div><h2 class="text-xl font-bold mb-1">👋 أهلاً بك أستاذ أحمد</h2><p class="text-slate-400 text-sm">إليك ملخص الإنجاز الميداني لمشاريع أبها وخميس مشيط.</p></div>
+                    <div class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2">
+                        <span class="relative flex h-3 w-3"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span></span>
+                        النظام الميداني متصل
+                    </div>
+                </div>
+
+                <!-- Team Tasks Widget -->
+                <div class="glass-panel p-8 rounded-3xl mb-8 border-t-4 border-indigo-500 shadow-lg">
+                    <h3 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">👥 فريق العمل المباشر ومهام اليوم</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div class="bg-slate-50 border border-slate-200 p-4 rounded-2xl flex items-center gap-4 hover:shadow-md transition-shadow">
+                            <div class="bg-amber-100 text-amber-600 w-12 h-12 flex justify-center items-center rounded-xl font-black text-lg">م.م</div>
+                            <div>
+                                <h4 class="font-bold text-sm text-slate-800">م. محمد</h4>
+                                <p class="text-xs text-slate-500 font-bold mb-1">إشراف التنفيذ</p>
+                                <p class="text-[10px] text-amber-600 bg-amber-50 px-2 py-1 rounded-md">إشراف صب خرسانة المسبح</p>
+                            </div>
+                        </div>
+                        <div class="bg-slate-50 border border-slate-200 p-4 rounded-2xl flex items-center gap-4 hover:shadow-md transition-shadow">
+                            <div class="bg-sky-100 text-sky-600 w-12 h-12 flex justify-center items-center rounded-xl font-black text-lg">م.ح</div>
+                            <div>
+                                <h4 class="font-bold text-sm text-slate-800">م. محسن</h4>
+                                <p class="text-xs text-slate-500 font-bold mb-1">تخطيط هندسي</p>
+                                <p class="text-[10px] text-sky-600 bg-sky-50 px-2 py-1 rounded-md">مراجعة مخططات تدفئة الديزل</p>
+                            </div>
+                        </div>
+                        <div class="bg-slate-50 border border-slate-200 p-4 rounded-2xl flex items-center gap-4 hover:shadow-md transition-shadow">
+                            <div class="bg-purple-100 text-purple-600 w-12 h-12 flex justify-center items-center rounded-xl font-black text-lg">ج</div>
+                            <div>
+                                <h4 class="font-bold text-sm text-slate-800">جواهر</h4>
+                                <p class="text-xs text-slate-500 font-bold mb-1">سكرتارية ومتابعة</p>
+                                <p class="text-[10px] text-purple-600 bg-purple-50 px-2 py-1 rounded-md">جدولة المعاينات وتنسيق التقارير</p>
+                            </div>
+                        </div>
+                        <div class="bg-slate-50 border border-slate-200 p-4 rounded-2xl flex items-center gap-4 hover:shadow-md transition-shadow">
+                            <div class="bg-emerald-100 text-emerald-600 w-12 h-12 flex justify-center items-center rounded-xl font-black text-lg">ف</div>
+                            <div>
+                                <h4 class="font-bold text-sm text-slate-800">فيصل</h4>
+                                <p class="text-xs text-slate-500 font-bold mb-1">مبيعات وتسعير</p>
+                                <p class="text-[10px] text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md">إغلاق عقود الصيانة الشتوية</p>
+                            </div>
+                        </div>
+                        <div class="bg-slate-50 border border-slate-200 p-4 rounded-2xl flex items-center gap-4 hover:shadow-md transition-shadow">
+                            <div class="bg-indigo-100 text-indigo-600 w-12 h-12 flex justify-center items-center rounded-xl font-black text-lg">أ.ب</div>
+                            <div>
+                                <h4 class="font-bold text-sm text-slate-800">أبو بكر</h4>
+                                <p class="text-xs text-slate-500 font-bold mb-1">تنسيق ميداني</p>
+                                <p class="text-[10px] text-indigo-600 bg-indigo-50 px-2 py-1 rounded-md">توزيع فنيي العزل للمواقع</p>
+                            </div>
+                        </div>
+                        <div class="bg-slate-50 border border-slate-200 p-4 rounded-2xl flex items-center gap-4 hover:shadow-md transition-shadow">
+                            <div class="bg-rose-100 text-rose-600 w-12 h-12 flex justify-center items-center rounded-xl font-black text-lg">أ.س</div>
+                            <div>
+                                <h4 class="font-bold text-sm text-slate-800">أ. أسعد</h4>
+                                <p class="text-xs text-slate-500 font-bold mb-1">شؤون قانونية</p>
+                                <p class="text-[10px] text-rose-600 bg-rose-50 px-2 py-1 rounded-md">تدقيق ملاحق عقود الضمان</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="glass-panel p-6 rounded-3xl text-center border-t-4 border-sky-500"><div class="text-4xl mb-2">🏗️</div><div class="text-4xl font-black text-slate-800 mb-1"><span class="dash-counter" id="val-active" data-target="24">0</span></div><div class="text-sm font-bold text-slate-500">مشاريع نشطة</div></div>
+                    <div class="glass-panel p-6 rounded-3xl text-center border-t-4 border-emerald-500"><div class="text-4xl mb-2">🤝</div><div class="text-4xl font-black text-slate-800 mb-1"><span class="dash-counter" data-target="12">0</span></div><div class="text-sm font-bold text-slate-500">عروض مبيعات</div></div>
+                    <div class="glass-panel p-6 rounded-3xl text-center border-t-4 border-amber-500"><div class="text-4xl mb-2">⚠️</div><div class="text-4xl font-black text-red-600 mb-1"><span class="dash-counter" data-target="3">0</span></div><div class="text-sm font-bold text-slate-500">تنبيهات فنية</div></div>
+                </div>
+
+                <div class="glass-panel p-8 rounded-3xl mb-8">
+                    <h3 class="text-xl font-bold text-slate-800 mb-4">📈 اتجاهات الطلب على الخدمات الأساسية</h3>
+                    <div class="chart-container"><canvas id="dashDemandChart"></canvas></div>
+                </div>
+            </section>
+
+            <section id="services" class="tab-content">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="lg:col-span-1 space-y-4">
+                        <h3 class="text-sm font-black text-slate-400 uppercase tracking-widest mb-4">الخدمات الميدانية:</h3>
+                        <button onclick="updatePolarChart('heating', this)" class="w-full text-right p-4 rounded-2xl bg-amber-50 border-2 border-amber-500 text-amber-900 font-bold transition-all service-btn flex items-center gap-3"><span class="text-2xl">🔥</span> التدفئة المركزية</button>
+                        <button onclick="updatePolarChart('pools', this)" class="w-full text-right p-4 rounded-2xl bg-white border border-slate-200 text-slate-600 font-bold transition-all service-btn flex items-center gap-3"><span class="text-2xl">🏊‍♂️</span> المسابح الخرسانية</button>
+                        <button onclick="updatePolarChart('fountains', this)" class="w-full text-right p-4 rounded-2xl bg-white border border-slate-200 text-slate-600 font-bold transition-all service-btn flex items-center gap-3"><span class="text-2xl">⛲</span> النوافير والشلالات</button>
+                        
+                        <div class="mt-6 bg-slate-800 text-white p-6 rounded-2xl shadow-lg border border-slate-700">
+                            <h4 class="text-xs font-bold text-amber-400 mb-2 flex items-center gap-2">💡 تحليل المساعد الذكي</h4>
+                            <p id="ai-insight-text" class="text-sm leading-relaxed text-slate-300">التدفئة المركزية بالديزل تحقق أعلى طلب في أبها حالياً. أنصح بتوجيه "فيصل" لتسريع العقود.</p>
+                            <button onclick="generateInsight()" id="btn-insight" class="mt-4 w-full bg-amber-500 text-slate-900 py-2 rounded-xl text-xs font-bold hover:bg-amber-400 transition-colors">🔄 قراءة استراتيجية للمؤشرات</button>
+                        </div>
+                    </div>
+                    <div class="lg:col-span-2 glass-panel p-8 rounded-3xl">
+                        <h3 id="service-chart-title" class="text-2xl font-bold text-slate-800 text-center mb-6">مؤشرات: التدفئة المركزية</h3>
+                        <div class="chart-container"><canvas id="dashPolarChart"></canvas></div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="ai-tools" class="tab-content">
+                <div class="mb-8 p-6 bg-amber-50 border border-amber-200 rounded-2xl flex items-center gap-4">
+                    <span class="text-3xl">🤖</span>
+                    <div>
+                        <h3 class="font-bold text-amber-900 text-lg">مجموعة أدوات "شعلة التدفئة" الذكية</h3>
+                        <p class="text-sm text-amber-700">جميع هذه الأدوات تم تخصيصها لمعايير مؤسستك (الخرسانة، الديزل، منطقة عسير) ومربوطة بأدوار فريقك.</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    
+                    <div class="glass-panel p-8 rounded-3xl border-t-4 border-sky-500">
+                        <h3 class="text-xl font-bold text-slate-800 mb-2 flex items-center gap-2"><span>✍️</span> صائغ عروض الأسعار الذكي</h3>
+                        <p class="text-sm text-slate-500 mb-6">مسودة عرض سعر احترافية وفخمة للعملاء الجدد.</p>
+                        <div class="space-y-4 mb-6">
+                            <input type="text" id="ai-prop-client" placeholder="اسم العميل (مثال: الشيخ خالد)" class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl text-sm outline-none focus:border-sky-500">
+                            <select id="ai-prop-service" class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl text-sm outline-none focus:border-sky-500">
+                                <option value="التدفئة المركزية بالديزل">التدفئة المركزية (ديزل)</option>
+                                <option value="المسابح والجاكوزي الخرساني">المسابح والجاكوزي الخرساني</option>
+                            </select>
+                            <input type="text" id="ai-prop-notes" placeholder="ملاحظات (مثال: مستعجل، يبي ضمان 10 سنين)" class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl text-sm outline-none focus:border-sky-500">
+                        </div>
+                        <button onclick="generateProposal()" id="btn-gen-proposal" class="w-full bg-slate-900 text-white px-6 py-3 rounded-xl text-sm font-bold hover:bg-sky-600 transition-colors mb-4">✨ صياغة العرض</button>
+                        <textarea id="ai-prop-output" class="w-full h-32 bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm text-slate-700 outline-none hidden custom-scrollbar" readonly placeholder="ستظهر النتيجة هنا..."></textarea>
+                    </div>
+
+                    <div class="glass-panel p-8 rounded-3xl border-t-4 border-rose-500">
+                        <h3 class="text-xl font-bold text-slate-800 mb-2 flex items-center gap-2"><span>😠</span> محلل شكاوى العملاء</h3>
+                        <p class="text-sm text-slate-500 mb-6">امتصاص غضب العميل وصياغة رد احترافي يحافظ على سمعة المؤسسة.</p>
+                        <textarea id="ai-complaint-text" placeholder="الصق رسالة أو شكوى العميل هنا..." class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl text-sm outline-none focus:border-rose-500 h-24 mb-4 custom-scrollbar"></textarea>
+                        <button onclick="generateComplaintResponse()" id="btn-gen-complaint" class="w-full bg-slate-900 text-white px-6 py-3 rounded-xl text-sm font-bold hover:bg-rose-600 transition-colors mb-4">✨ تحليل وصياغة الرد</button>
+                        <textarea id="ai-complaint-output" class="w-full h-32 bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm text-slate-700 outline-none hidden custom-scrollbar" readonly placeholder="ستظهر النتيجة هنا..."></textarea>
+                    </div>
+
+                    <div class="glass-panel p-8 rounded-3xl border-t-4 border-emerald-500">
+                        <h3 class="text-xl font-bold text-slate-800 mb-2 flex items-center gap-2"><span>🛠️</span> المستشار الفني الميداني</h3>
+                        <p class="text-sm text-slate-500 mb-6">اقتراح حلول هندسية سريعة للمشاكل الطارئة في مواقع العمل.</p>
+                        <textarea id="ai-tech-issue" placeholder="صف المشكلة الفنية (مثال: هبوط مفاجئ في ضغط مضخة المسبح)..." class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl text-sm outline-none focus:border-emerald-500 h-24 mb-4 custom-scrollbar"></textarea>
+                        <button onclick="generateTechAdvice()" id="btn-gen-tech" class="w-full bg-slate-900 text-white px-6 py-3 rounded-xl text-sm font-bold hover:bg-emerald-600 transition-colors mb-4">✨ اقتراح حلول هندسية</button>
+                        <textarea id="ai-tech-output" class="w-full h-32 bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm text-slate-700 outline-none hidden custom-scrollbar" readonly placeholder="ستظهر النتيجة هنا..."></textarea>
+                    </div>
+
+                    <div class="glass-panel p-8 rounded-3xl border-t-4 border-amber-600">
+                        <h3 class="text-xl font-bold text-slate-800 mb-2 flex items-center gap-2"><span>💰</span> مستشار التسعير وتقدير التكاليف</h3>
+                        <p class="text-sm text-slate-500 mb-6">حساب تقديري وتوزيع التكاليف وهوامش الربح.</p>
+                        <textarea id="ai-pricing-input" placeholder="أدخل تفاصيل المشروع (مثال: مسبح خرساني 4×8 في أبها، يحتاج عزل أمريكي)..." class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl text-sm outline-none focus:border-amber-600 h-24 mb-4 custom-scrollbar"></textarea>
+                        <button onclick="generatePricingEstimate()" id="btn-gen-pricing" class="w-full bg-slate-900 text-white px-6 py-3 rounded-xl text-sm font-bold hover:bg-amber-600 transition-colors mb-4">✨ تقدير التكلفة</button>
+                        <textarea id="ai-pricing-output" class="w-full h-32 bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm text-slate-700 outline-none hidden custom-scrollbar" readonly placeholder="ستظهر الحسابات هنا..."></textarea>
+                    </div>
+
+                    <div class="glass-panel p-8 rounded-3xl border-t-4 border-indigo-500">
+                        <h3 class="text-xl font-bold text-slate-800 mb-2 flex items-center gap-2"><span>🎙️</span> محلل الاجتماعات</h3>
+                        <p class="text-sm text-slate-500 mb-6">يلخص الملاحظات العشوائية ويوزع المهام على الفريق.</p>
+                        <textarea id="ai-meeting-notes" placeholder="الصق الملاحظات من اجتماع الإدارة أو العميل هنا..." class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl text-sm outline-none focus:border-indigo-500 h-24 mb-4 custom-scrollbar"></textarea>
+                        <button onclick="generateMeetingSummary()" id="btn-gen-meeting" class="w-full bg-slate-900 text-white px-6 py-3 rounded-xl text-sm font-bold hover:bg-indigo-600 transition-colors mb-4">✨ تفريغ وتوزيع المهام</button>
+                        <textarea id="ai-meeting-output" class="w-full h-32 bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm text-slate-700 outline-none hidden custom-scrollbar" readonly placeholder="ستظهر النتيجة هنا..."></textarea>
+                    </div>
+
+                    <div class="glass-panel p-8 rounded-3xl border-t-4 border-pink-500">
+                        <h3 class="text-xl font-bold text-slate-800 mb-2 flex items-center gap-2"><span>📱</span> صانع المحتوى التسويقي</h3>
+                        <p class="text-sm text-slate-500 mb-6">صياغة منشورات جذابة وفاخرة لمواقع التواصل الاجتماعي.</p>
+                        <textarea id="ai-marketing-input" placeholder="صف المشروع المنجز (مثال: تم تسليم مسبح أوفر فلو 5×10 في أبها)..." class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl text-sm outline-none focus:border-pink-500 h-24 mb-4 custom-scrollbar"></textarea>
+                        <button onclick="generateMarketingPost()" id="btn-gen-marketing" class="w-full bg-slate-900 text-white px-6 py-3 rounded-xl text-sm font-bold hover:bg-pink-600 transition-colors mb-4">✨ توليد منشور تسويقي</button>
+                        <textarea id="ai-marketing-output" class="w-full h-32 bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm text-slate-700 outline-none hidden custom-scrollbar" readonly placeholder="النص التسويقي..."></textarea>
+                    </div>
+
+                    <div class="glass-panel p-8 rounded-3xl border-t-4 border-orange-500">
+                        <h3 class="text-xl font-bold text-slate-800 mb-2 flex items-center gap-2"><span>🦺</span> مفتش السلامة الميدانية</h3>
+                        <p class="text-sm text-slate-500 mb-6">تحليل بيئة العمل واكتشاف المخاطر لتوجيه الفنيين بإجراءات السلامة.</p>
+                        <textarea id="ai-safety-input" placeholder="صف موقع العمل والمخاطر (مثال: حفر مسبح عميق بجانب جدار قديم)..." class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl text-sm outline-none focus:border-orange-500 h-24 mb-4 custom-scrollbar"></textarea>
+                        <button onclick="generateSafetyReport()" id="btn-gen-safety" class="w-full bg-slate-900 text-white px-6 py-3 rounded-xl text-sm font-bold hover:bg-orange-600 transition-colors mb-4">✨ استخراج خطة السلامة</button>
+                        <textarea id="ai-safety-output" class="w-full h-32 bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm text-slate-700 outline-none hidden custom-scrollbar" readonly placeholder="توصيات السلامة..."></textarea>
+                    </div>
+
+                    <div class="glass-panel p-8 rounded-3xl border-t-4 border-yellow-500">
+                        <h3 class="text-xl font-bold text-slate-800 mb-2 flex items-center gap-2"><span>♻️</span> عقود الصيانة وإعادة الاستهداف</h3>
+                        <p class="text-sm text-slate-500 mb-6">إعادة استهداف العملاء السابقين بعروض صيانة سنوية أو ترقيات.</p>
+                        <textarea id="ai-upsell-input" placeholder="معلومات العميل (مثال: ركبنا له تدفئة ديزل قبل سنتين، نبي نعرض صيانة قبل الشتاء)..." class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl text-sm outline-none focus:border-yellow-500 h-24 mb-4 custom-scrollbar"></textarea>
+                        <button onclick="generateUpsellMessage()" id="btn-gen-upsell" class="w-full bg-slate-900 text-white px-6 py-3 rounded-xl text-sm font-bold hover:bg-yellow-600 transition-colors mb-4">✨ صياغة رسالة الاستهداف</button>
+                        <textarea id="ai-upsell-output" class="w-full h-32 bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm text-slate-700 outline-none hidden custom-scrollbar" readonly placeholder="مسودة الرسالة..."></textarea>
+                    </div>
+
+                    <div class="lg:col-span-2 glass-panel p-8 rounded-3xl border-t-4 border-slate-700">
+                        <h3 class="text-xl font-bold text-slate-800 mb-2 flex items-center gap-2"><span>📅</span> مجدول التكليفات وجداول الفنيين</h3>
+                        <p class="text-sm text-slate-500 mb-6">تنظيم المهام الميدانية العشوائية في جدول يومي منسق وجاهز للإرسال.</p>
+                        <textarea id="ai-dispatch-input" placeholder="اكتب التكليفات اليومية عشوائياً (مثال: مدثر يروح موقع حي النرجس يكمل العزل، ورضوان يمر موقع أبها...)" class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl text-sm outline-none focus:border-slate-700 h-24 mb-4 custom-scrollbar"></textarea>
+                        <button onclick="generateDispatchSchedule()" id="btn-gen-dispatch" class="w-full bg-slate-900 text-white px-6 py-3 rounded-xl text-sm font-bold hover:bg-slate-700 transition-colors mb-4">✨ توليد جدول التكليفات اليومي</button>
+                        <textarea id="ai-dispatch-output" class="w-full h-40 bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm text-slate-700 outline-none hidden custom-scrollbar" readonly placeholder="الجدول جاهز للإرسال..."></textarea>
+                    </div>
+
+                    <div class="lg:col-span-2 glass-panel p-8 rounded-3xl border-t-4 border-purple-500">
+                        <h3 class="text-xl font-bold text-slate-800 mb-2 flex items-center gap-2"><span>⚖️</span> صائغ البنود العقدية القانونية</h3>
+                        <p class="text-sm text-slate-500 mb-6">صياغة بنود قانونية لتبديد تخوف العميل وحماية المؤسسة.</p>
+                        <textarea id="ai-contract-risk" placeholder="تخوف العميل (مثال: يخاف من تسريب المسبح بعد سنة)" class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl text-sm outline-none focus:border-purple-500 h-24 mb-4 custom-scrollbar"></textarea>
+                        <button onclick="generateContractClause()" id="btn-gen-contract" class="w-full bg-slate-900 text-white px-6 py-3 rounded-xl text-sm font-bold hover:bg-purple-600 transition-colors mb-4">✨ صياغة البند القانوني</button>
+                        <textarea id="ai-contract-output" class="w-full h-32 bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm text-slate-700 outline-none hidden custom-scrollbar" readonly placeholder="البند القانوني..."></textarea>
+                    </div>
+
+                    <div class="lg:col-span-2 glass-panel p-8 rounded-3xl border-t-4 border-teal-500">
+                        <h3 class="text-xl font-bold text-slate-800 mb-2 flex items-center gap-2"><span>🤝</span> مفاوض المشتريات والموردين</h3>
+                        <p class="text-sm text-slate-500 mb-6">صياغة رسائل تفاوض احترافية للحصول على أفضل الخصومات.</p>
+                        <textarea id="ai-procurement-input" placeholder="اكتب طلبك للمورد (مثال: نحتاج 50 لفة مواسير بيكس، نطلب خصم 15% أو توصيل مجاني)..." class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl text-sm outline-none focus:border-teal-500 h-24 mb-4 custom-scrollbar"></textarea>
+                        <button onclick="generateProcurementMessage()" id="btn-gen-procurement" class="w-full bg-slate-900 text-white px-6 py-3 rounded-xl text-sm font-bold hover:bg-teal-600 transition-colors mb-4">✨ صياغة رسالة التفاوض</button>
+                        <textarea id="ai-procurement-output" class="w-full h-32 bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm text-slate-700 outline-none hidden custom-scrollbar" readonly placeholder="رسالة التفاوض..."></textarea>
+                    </div>
+
+                </div>
+            </section>
+        </main>
+
+        <!-- Private AI Chat -->
+        <div class="fixed bottom-6 left-6 z-50 flex flex-col items-start">
+            <div id="priv-chat-window" class="hidden bg-white/95 backdrop-blur-xl border border-slate-200 shadow-2xl rounded-3xl w-[340px] md:w-[400px] h-[500px] mb-4 flex flex-col overflow-hidden">
+                <div class="bg-slate-900 p-4 text-white flex justify-between items-center shadow-md">
+                    <span class="font-bold text-sm flex items-center gap-2"><span class="text-xl">🤖</span> مساعد أ. أحمد التنفيذي</span>
+                    <button onclick="document.getElementById('priv-chat-window').classList.add('hidden')" class="text-slate-400 hover:text-white font-bold">✕</button>
+                </div>
+                <div id="priv-chat-messages" class="flex-1 p-4 overflow-y-auto flex flex-col gap-4 bg-slate-50 custom-scrollbar">
+                    <div class="bg-amber-100 text-amber-900 p-3 rounded-2xl rounded-tr-none text-sm w-[90%] self-start font-medium leading-relaxed">
+                        أهلاً بك أستاذ أحمد 👑. أنا مساعدك الإداري التنفيذي.<br><br>
+                        كيف تسير الأمور في الميدان اليوم؟ هل واجه (م. محمد) أو (م. محسن) أي عقبات في المواقع؟ وإذا كان هناك مهام تريد مني صياغتها وتفويضها لـ (جواهر) أو (أبو بكر) لتسهيل عملك، فقط وجهني بكلمة واحدة وسأقوم بالتنظيم نيابة عنك.
+                    </div>
+                </div>
+                <div class="p-3 bg-white border-t border-slate-200 flex flex-col gap-2">
+                    <textarea id="priv-chat-input" placeholder="اطلب تقريراً، أو وجه رسالة لفريقك..." class="w-full bg-slate-100 p-3 rounded-xl text-sm outline-none resize-none h-16 custom-scrollbar" onkeypress="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); sendPrivMsg(); }"></textarea>
+                    <div class="flex justify-between items-center">
+                        <span class="text-[10px] text-slate-400 font-bold">Powered by Gemini AI</span>
+                        <button onclick="sendPrivMsg()" id="btn-priv-send" class="bg-slate-900 text-white px-6 py-2 rounded-xl text-xs font-bold hover:bg-amber-500 hover:text-slate-900 transition-colors">إرسال</button>
+                    </div>
+                </div>
+            </div>
+            <button onclick="document.getElementById('priv-chat-window').classList.toggle('hidden')" class="bg-slate-900 text-white w-14 h-14 rounded-full shadow-2xl flex items-center justify-center hover:bg-amber-500 hover:text-slate-900 transition-all border-2 border-white/20 text-2xl">✨</button>
+        </div>
+    </div>
+
+    <script>
+        const apiKey = ""; 
+        const GEMINI_MODEL = "gemini-2.5-flash-preview-09-2025";
+
+        // --- Data Persistence for Actual Numbers ---
+        const defaultNums = { completed: 1500, experts: 45, satisfaction: 98, warranty: 10, active: 24, offers: 12, alerts: 3 };
+        
+        function loadActualNumbers() {
+            const nums = JSON.parse(localStorage.getItem('shola_actual_numbers')) || defaultNums;
+            
+            if(document.getElementById('val-completed')) document.getElementById('val-completed').setAttribute('data-target', nums.completed);
+            if(document.getElementById('val-satisfaction')) document.getElementById('val-satisfaction').setAttribute('data-target', nums.satisfaction);
+            if(document.getElementById('val-experts')) document.getElementById('val-experts').setAttribute('data-target', nums.experts);
+            if(document.getElementById('val-warranty')) document.getElementById('val-warranty').setAttribute('data-target', nums.warranty);
+            if(document.getElementById('val-active')) document.getElementById('val-active').setAttribute('data-target', nums.active);
+            
+            if(document.getElementById('inp-completed')) document.getElementById('inp-completed').value = nums.completed;
+            if(document.getElementById('inp-experts')) document.getElementById('inp-experts').value = nums.experts;
+            if(document.getElementById('inp-active')) document.getElementById('inp-active').value = nums.active;
+            if(document.getElementById('inp-satisfaction')) document.getElementById('inp-satisfaction').value = nums.satisfaction;
+        }
+
+        function saveActualNumbers() {
+            const nums = JSON.parse(localStorage.getItem('shola_actual_numbers')) || defaultNums;
+            nums.completed = document.getElementById('inp-completed').value || nums.completed;
+            nums.experts = document.getElementById('inp-experts').value || nums.experts;
+            nums.active = document.getElementById('inp-active').value || nums.active;
+            nums.satisfaction = document.getElementById('inp-satisfaction').value || nums.satisfaction;
+            
+            localStorage.setItem('shola_actual_numbers', JSON.stringify(nums));
+            document.getElementById('settings-modal').classList.add('hidden');
+            loadActualNumbers();
+            
+            document.querySelectorAll('.pub-counter').forEach(el => el.innerText = '0');
+            document.querySelectorAll('.dash-counter').forEach(el => el.innerText = '0');
+            animateCounters('.pub-counter', 50);
+            animateCounters('.dash-counter', 50);
+            alert('تم حفظ الأرقام وتحديث الواجهات بنجاح!');
+        }
+
+        // --- Core Gemini Caller ---
+        async function callGemini(prompt, systemInstruction = "") {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
+            const payload = { contents: [{ parts: [{ text: prompt }] }], systemInstruction: { parts: [{ text: systemInstruction }] } };
+
+            for (let i = 0; i < 3; i++) {
+                try {
+                    const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                    if (!response.ok) throw new Error(`API Error`);
+                    const data = await response.json();
+                    return data.candidates?.[0]?.content?.parts?.[0]?.text || "عذراً، لم أتمكن من الاستجابة.";
+                } catch (error) {
+                    if (i === 2) return "حدث خطأ في الاتصال بالخادم. يرجى التأكد من توفر مفتاح API.";
+                    await new Promise(res => setTimeout(res, 1500));
+                }
+            }
+        }
+
+        // --- View Switching (Login/Logout) ---
+        function attemptLogin() {
+            const id = document.getElementById('login-id').value.trim();
+            const pass = document.getElementById('login-pass').value.trim();
+            const err = document.getElementById('login-error');
+            
+            if (id === 'HT-1001' && pass === 'Admin99') {
+                err.classList.add('hidden');
+                document.getElementById('login-modal').classList.add('hidden');
+                document.getElementById('public-view').classList.add('hidden');
+                document.getElementById('dashboard-view').classList.remove('hidden');
+                
+                if (!window.dashInitDone) {
+                    initDashboardCharts();
+                    animateCounters('.dash-counter', 50);
+                    window.dashInitDone = true;
+                }
+            } else { err.classList.remove('hidden'); }
+        }
+
+        function logout() {
+            document.getElementById('dashboard-view').classList.add('hidden');
+            document.getElementById('public-view').classList.remove('hidden');
+            document.getElementById('login-id').value = '';
+            document.getElementById('login-pass').value = '';
+        }
+
+        function switchDashTab(tabId) {
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`btn-${tabId}`).classList.add('active');
+            document.querySelectorAll('.tab-content').forEach(c => {
+                c.classList.remove('active');
+                setTimeout(() => { if(!c.classList.contains('active')) c.style.display = 'none'; }, 400);
+            });
+            const target = document.getElementById(tabId);
+            setTimeout(() => {
+                target.style.display = 'block';
+                setTimeout(() => target.classList.add('active'), 50);
+            }, 400);
+        }
+
+        // --- Animations ---
+        function animateCounters(selector, speed) {
+            document.querySelectorAll(selector).forEach(counter => {
+                const target = +counter.getAttribute('data-target');
+                let current = 0;
+                const inc = target / speed;
+                const update = () => {
+                    current += inc;
+                    if (current < target) {
+                        counter.innerText = Math.ceil(current);
+                        requestAnimationFrame(update);
+                    } else counter.innerText = target;
+                };
+                update();
+            });
+        }
+
+        // --- Public Charts ---
+        function initPublicCharts() {
+            Chart.defaults.font.family = "'Tajawal', sans-serif";
+            const ctx1 = document.getElementById('publicServicesChart').getContext('2d');
+            new Chart(ctx1, {
+                type: 'doughnut',
+                data: {
+                    labels: ['التدفئة المركزية', 'المسابح الخرسانية', 'النوافير', 'الساونا'],
+                    datasets: [{ data: [45, 30, 15, 10], backgroundColor: ['#f59e0b', '#0ea5e9', '#10b981', '#a855f7'], borderWidth: 0 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' } } }
+            });
+        }
+
+        // --- Dashboard Data & Charts ---
+        const dashData = {
+            heating: { title: "التدفئة المركزية (ديزل)", data: [95, 85, 60, 90] },
+            pools: { title: "المسابح (خرسانة مسلحة)", data: [80, 75, 70, 95] },
+            fountains: { title: "النوافير والشلالات", data: [60, 65, 85, 80] }
+        };
+        let polarChartInstance = null;
+        let currentSectorForInsight = 'heating';
+
+        function initDashboardCharts() {
+            const ctxDemand = document.getElementById('dashDemandChart').getContext('2d');
+            new Chart(ctxDemand, {
+                type: 'line',
+                data: {
+                    labels: ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو'],
+                    datasets: [
+                        { label: 'التدفئة', data: [12, 19, 25, 32, 28, 15], borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,0.2)', fill: true, tension: 0.4 },
+                        { label: 'المسابح', data: [5, 8, 12, 20, 35, 42], borderColor: '#0ea5e9', backgroundColor: 'rgba(14,165,233,0.2)', fill: true, tension: 0.4 }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+
+            const ctxPolar = document.getElementById('dashPolarChart').getContext('2d');
+            polarChartInstance = new Chart(ctxPolar, {
+                type: 'polarArea',
+                data: {
+                    labels: ['حجم الطلب', 'هامش الربحية', 'سرعة التنفيذ', 'رضا العملاء'],
+                    datasets: [{ data: dashData.heating.data, backgroundColor: ['rgba(245, 158, 11, 0.7)', 'rgba(245, 158, 11, 0.5)', 'rgba(245, 158, 11, 0.3)', 'rgba(245, 158, 11, 0.9)'], borderWidth: 2 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, scales: { r: { ticks: { display: false } } } }
+            });
+        }
+
+        function updatePolarChart(sectorKey, btn) {
+            currentSectorForInsight = sectorKey;
+            document.querySelectorAll('.service-btn').forEach(b => {
+                b.classList.remove('bg-amber-50', 'border-amber-500', 'text-amber-900');
+                b.classList.add('bg-white', 'border-slate-200', 'text-slate-600');
+            });
+            btn.classList.add('bg-amber-50', 'border-amber-500', 'text-amber-900');
+            btn.classList.remove('bg-white', 'border-slate-200', 'text-slate-600');
+
+            document.getElementById('service-chart-title').innerText = `مؤشرات: ${dashData[sectorKey].title}`;
+            
+            if (polarChartInstance) {
+                polarChartInstance.data.datasets[0].data = dashData[sectorKey].data;
+                const baseColor = sectorKey === 'heating' ? '245,158,11' : (sectorKey === 'pools' ? '14,165,233' : '16,185,129');
+                polarChartInstance.data.datasets[0].backgroundColor = [`rgba(${baseColor}, 0.7)`, `rgba(${baseColor}, 0.5)`, `rgba(${baseColor}, 0.3)`, `rgba(${baseColor}, 0.9)`];
+                polarChartInstance.update();
+            }
+            document.getElementById('ai-insight-text').innerText = "اضغط على زر التحديث لقراءة المؤشرات الجديدة...";
+        }
+
+        // --- AI Chat Functions ---
+        async function sendPubMsg() {
+            const input = document.getElementById('pub-chat-input');
+            const box = document.getElementById('pub-chat-messages');
+            const msg = input.value.trim();
+            if(!msg) return;
+
+            box.innerHTML += `<div class="bg-amber-500 text-slate-900 p-3 rounded-2xl rounded-tl-none text-sm w-[85%] self-end font-bold">${msg}</div>`;
+            input.value = ''; box.scrollTop = box.scrollHeight;
+
+            const inst = "أنت مندوب مبيعات وخدمة عملاء مؤسسة شعلة التدفئة السعودية في أبها وخميس مشيط. أجب باحترافية واختصار. تذكر أن مسابحنا خرسانية بحتة (لا فايبرجلاس) وتدفئتنا تعتمد قوة الديزل. اطلب من العميل التواصل لأخذ موعد معاينة.";
+            const reply = await callGemini(msg, inst);
+            
+            box.innerHTML += `<div class="bg-white border border-slate-200 text-slate-800 p-3 rounded-2xl rounded-tr-none text-sm w-[90%] self-start whitespace-pre-wrap">${reply}</div>`;
+            box.scrollTop = box.scrollHeight;
+        }
+
+        async function sendPrivMsg() {
+            const input = document.getElementById('priv-chat-input');
+            const box = document.getElementById('priv-chat-messages');
+            const btn = document.getElementById('btn-priv-send');
+            const msg = input.value.trim();
+            if(!msg) return;
+
+            box.innerHTML += `<div class="bg-slate-800 text-white p-3 rounded-2xl rounded-tl-none text-sm w-[85%] self-end">${msg}</div>`;
+            input.value = ''; box.scrollTop = box.scrollHeight;
+            btn.innerText = '⏳'; btn.disabled = true;
+
+            const inst = `أنت المساعد الإداري والتنفيذي الذكي لـ "أ. أحمد"، المدير العام لـ "مؤسسة شعلة التدفئة" في أبها وخميس مشيط. مهمتك الرد باحترام واختصار وبصيغة "أستاذ أحمد". 
+            فريق العمل: فيصل (مبيعات)، م. محمد (تنفيذ)، م. محسن (إشراف ومخططات)، أبو بكر (تنسيق)، أ. أسعد (قانونية)، جواهر (سكرتارية ومتابعة عملاء). 
+            قم بتنظيم المهام عن المدير العام لتسهيل حياته العملية، واسألني دائماً عن آخر التحديثات في الميدان وما إذا كنت بحاجة لتذكير أو تفويض مهمة لأحدهم نيابة عنك. نحن نستخدم الخرسانة المسلحة والديزل للتدفئة.`;
+            const reply = await callGemini(msg, inst);
+            
+            box.innerHTML += `<div class="bg-amber-100 text-amber-900 p-3 rounded-2xl rounded-tr-none text-sm w-[90%] self-start whitespace-pre-wrap font-medium">${reply}</div>`;
+            box.scrollTop = box.scrollHeight;
+            btn.innerText = 'إرسال'; btn.disabled = false;
+        }
+
+        // --- All 11 AI Tools Functions ---
+        async function generateInsight() {
+            const btn = document.getElementById('btn-insight');
+            const textEl = document.getElementById('ai-insight-text');
+            const sec = dashData[currentSectorForInsight];
+            btn.disabled = true; btn.innerText = '⏳ يقرأ...';
+            textEl.innerHTML = '<span class="animate-pulse">يحلل المؤشرات...</span>';
+            const prompt = `حلل مقاييس أداء "${sec.title}": الطلب ${sec.data[0]}, الربح ${sec.data[1]}, السرعة ${sec.data[2]}, الرضا ${sec.data[3]}. اكتب توجيه تنفيذي موجز (30 كلمة) للمدير العام أحمد يحدد نقطة القوة ونقطة تتطلب متابعة الموظفين.`;
+            textEl.innerText = await callGemini(prompt, "أنت مستشار أعمال.");
+            btn.disabled = false; btn.innerText = '🔄 قراءة استراتيجية للمؤشرات';
+        }
+
+        async function generateProposal() {
+            const client = document.getElementById('ai-prop-client').value || 'العميل';
+            const service = document.getElementById('ai-prop-service').value;
+            const notes = document.getElementById('ai-prop-notes').value;
+            const btn = document.getElementById('btn-gen-proposal');
+            const out = document.getElementById('ai-prop-output');
+            btn.disabled = true; btn.innerText = '⏳ جاري الصياغة...'; out.classList.remove('hidden'); out.value = 'يتم بناء مسودة العرض...';
+            const prompt = `صغ رسالة واتساب مبيعات فخمة من "شعلة التدفئة" للعميل "${client}" لخدمة "${service}". ملاحظاته: "${notes}". ركز بقوة على متانة التنفيذ الخرساني وجودة الديزل، واطلب موعد معاينة.`;
+            out.value = await callGemini(prompt, "أنت مدير مبيعات عقود فاخرة.");
+            btn.disabled = false; btn.innerText = '✨ صياغة العرض';
+        }
+
+        async function generateComplaintResponse() {
+            const complaint = document.getElementById('ai-complaint-text').value;
+            const btn = document.getElementById('btn-gen-complaint');
+            const out = document.getElementById('ai-complaint-output');
+            if(!complaint) return alert('أدخل الشكوى!');
+            btn.disabled = true; btn.innerText = '⏳ يحلل...'; out.classList.remove('hidden'); out.value = 'يتم صياغة الرد...';
+            const prompt = `أرسل عميل شكوى: "${complaint}". المطلوب: رسالة واتساب احترافية للرد عليه لامتصاص غضبه، والوعد بإرسال فريق الصيانة فوراً للحفاظ على سمعة شعلة التدفئة.`;
+            out.value = await callGemini(prompt, "أنت مدير خدمة عملاء محترف.");
+            btn.disabled = false; btn.innerText = '✨ تحليل وصياغة الرد';
+        }
+
+        async function generateTechAdvice() {
+            const issue = document.getElementById('ai-tech-issue').value;
+            const btn = document.getElementById('btn-gen-tech');
+            const out = document.getElementById('ai-tech-output');
+            if(!issue) return alert('صف المشكلة الفنية!');
+            btn.disabled = true; btn.innerText = '⏳ يبحث...'; out.classList.remove('hidden'); out.value = 'يحلل المشكلة هندسياً...';
+            const prompt = `يواجه فريق العمل في "شعلة التدفئة" هذه المشكلة: "${issue}". المطلوب: 3 خطوات فنية متسلسلة كدليل سريع لحل هذه المشكلة في الموقع.`;
+            out.value = await callGemini(prompt, "أنت مهندس ومستشار ميكانيكي لشركات المقاولات.");
+            btn.disabled = false; btn.innerText = '✨ اقتراح حلول هندسية';
+        }
+
+        async function generatePricingEstimate() {
+            const pricingInput = document.getElementById('ai-pricing-input').value;
+            const btn = document.getElementById('btn-gen-pricing');
+            const out = document.getElementById('ai-pricing-output');
+            if(!pricingInput) return alert('أدخل تفاصيل المشروع!');
+            btn.disabled = true; btn.innerText = '⏳ يحسب...'; out.classList.remove('hidden'); out.value = 'يحلل بنود التوريد...';
+            const prompt = `حلل هذا المشروع التابع لـ شعلة التدفئة: "${pricingInput}". المطلوب: 1. المواد. 2. تقدير التكلفة الإجمالية وهامش الربح. 3. نصيحة تسعيرية.`;
+            out.value = await callGemini(prompt, "أنت مقدر تكاليف هندسية في السعودية.");
+            btn.disabled = false; btn.innerText = '✨ تقدير التكلفة';
+        }
+
+        async function generateMeetingSummary() {
+            const notes = document.getElementById('ai-meeting-notes').value;
+            const btn = document.getElementById('btn-gen-meeting');
+            const out = document.getElementById('ai-meeting-output');
+            if(!notes) return alert('أدخل الملاحظات!');
+            btn.disabled = true; btn.innerText = '⏳ يحلل...'; out.classList.remove('hidden'); out.value = 'يفرغ الاجتماع...';
+            const prompt = `لخص هذا الاجتماع ووزع المهام بوضوح (لمحمد ومحسن وفنييهم، فيصل، أسعد، أبو بكر، جواهر): "${notes}". النسق: 1. ملخص. 2. تفويض مهام مباشر ومختصر جداً لتسهيل المتابعة على أ. أحمد.`;
+            out.value = await callGemini(prompt, "أنت مساعد تنفيذي ينظم الاجتماعات.");
+            btn.disabled = false; btn.innerText = '✨ تفريغ وتوزيع المهام';
+        }
+
+        async function generateMarketingPost() {
+            const input = document.getElementById('ai-marketing-input').value;
+            const btn = document.getElementById('btn-gen-marketing');
+            const out = document.getElementById('ai-marketing-output');
+            if(!input) return alert('أدخل تفاصيل المشروع!');
+            btn.disabled = true; btn.innerText = '⏳ يصيغ...'; out.classList.remove('hidden'); out.value = 'يصيغ منشور...';
+            const prompt = `أُنجز المشروع: "${input}". المطلوب: منشور جذاب لمنصات التواصل يبرز قوة مؤسسة "شعلة التدفئة" في الخرسانة والأنظمة الميكانيكية، مع هاشتاقات للسوق السعودي.`;
+            out.value = await callGemini(prompt, "أنت صانع محتوى محترف.");
+            btn.disabled = false; btn.innerText = '✨ توليد منشور تسويقي';
+        }
+
+        async function generateSafetyReport() {
+            const input = document.getElementById('ai-safety-input').value;
+            const btn = document.getElementById('btn-gen-safety');
+            const out = document.getElementById('ai-safety-output');
+            if(!input) return alert('أدخل وصف الموقع!');
+            btn.disabled = true; btn.innerText = '⏳ يفحص...'; out.classList.remove('hidden'); out.value = 'يستخرج الخطة...';
+            const prompt = `بيئة العمل في الموقع: "${input}". اكتب تقريراً من 3 نقاط لتنبيه فنيي مؤسسة "شعلة التدفئة" بإجراءات السلامة فوراً لتجنب الحوادث.`;
+            out.value = await callGemini(prompt, "أنت مفتش سلامة مهنية (OSHA).");
+            btn.disabled = false; btn.innerText = '✨ استخراج خطة السلامة';
+        }
+
+        async function generateUpsellMessage() {
+            const input = document.getElementById('ai-upsell-input').value;
+            const btn = document.getElementById('btn-gen-upsell');
+            const out = document.getElementById('ai-upsell-output');
+            if(!input) return alert('أدخل بيانات العميل القديم!');
+            btn.disabled = true; btn.innerText = '⏳ يصيغ...'; out.classList.remove('hidden'); out.value = 'يصيغ الرسالة...';
+            const prompt = `العميل القديم: "${input}". اكتب رسالة واتساب ودية من "شعلة التدفئة" نعرض فيها عقد صيانة سنوي أو ترقية نظامه لضمان الكفاءة.`;
+            out.value = await callGemini(prompt, "أنت خبير مبيعات وإعادة استهداف.");
+            btn.disabled = false; btn.innerText = '✨ صياغة رسالة الاستهداف';
+        }
+
+        async function generateDispatchSchedule() {
+            const input = document.getElementById('ai-dispatch-input').value;
+            const btn = document.getElementById('btn-gen-dispatch');
+            const out = document.getElementById('ai-dispatch-output');
+            if(!input) return alert('أدخل التكليفات عشوائياً!');
+            btn.disabled = true; btn.innerText = '⏳ يجدول...'; out.classList.remove('hidden'); out.value = 'يرتب التكليفات...';
+            const prompt = `التكليفات: "${input}". حولها إلى جدول رسمي لمنسوبي "شعلة التدفئة" جاهز للنشر في الجروب: "📋 جدول التكليفات الميدانية". قسم المهام بوضوح لكل فني (بإشراف م. محسن وم. محمد).`;
+            out.value = await callGemini(prompt, "أنت منسق العمليات الميدانية.");
+            btn.disabled = false; btn.innerText = '✨ توليد جدول التكليفات اليومي';
+        }
+
+        async function generateContractClause() {
+            const risk = document.getElementById('ai-contract-risk').value;
+            const btn = document.getElementById('btn-gen-contract');
+            const out = document.getElementById('ai-contract-output');
+            if(!risk) return alert('أدخل تخوف العميل!');
+            btn.disabled = true; btn.innerText = '⏳ يصيغ...'; out.classList.remove('hidden'); out.value = 'يكتب البند...';
+            const prompt = `تخوف العميل: "${risk}". صغ بند عقدي رصين لمؤسسة "شعلة التدفئة" يحميها ويطمئن العميل لجودة التنفيذ الخرساني.`;
+            out.value = await callGemini(prompt, "أنت مستشار قانوني للعقود الهندسية.");
+            btn.disabled = false; btn.innerText = '✨ صياغة البند القانوني';
+        }
+
+        async function generateProcurementMessage() {
+            const input = document.getElementById('ai-procurement-input').value;
+            const btn = document.getElementById('btn-gen-procurement');
+            const out = document.getElementById('ai-procurement-output');
+            if(!input) return alert('أدخل تفاصيل الطلب!');
+            btn.disabled = true; btn.innerText = '⏳ يصيغ...'; out.classList.remove('hidden'); out.value = 'يصيغ الرسالة...';
+            const prompt = `الطلب من المورد: "${input}". صغ رسالة واتساب رسمية وقوية من مشتريات "شعلة التدفئة" لطلب الخصم والتلميح بشراكة استراتيجية طويلة الأمد.`;
+            out.value = await callGemini(prompt, "أنت مدير مشتريات محترف.");
+            btn.disabled = false; btn.innerText = '✨ صياغة رسالة التفاوض';
+        }
+
+        // Initialization
+        window.addEventListener('DOMContentLoaded', () => {
+            loadActualNumbers();
+            initPublicCharts();
+            animateCounters('.pub-counter', 50);
+        });
+    </script>
+</body>
+</html>
