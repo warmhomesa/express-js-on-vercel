@@ -1,4 +1,108 @@
-<!doctype html>
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم المدمجة | Warm Home</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- الشريط الجانبي -->
+        <aside class="sidebar">
+            <div class="logo">
+                <h2>شعلة التدفئة</h2>
+                <span class="badge">Vercel App</span>
+            </div>
+            <nav class="nav-menu">
+                <button class="nav-item active" onclick="switchTab('current-view')">
+                    <span class="icon">📊</span>
+                    <span>الواجهة الحالية</span>
+                </button>
+                <button class="nav-item" onclick="switchTab('legacy-view')">
+                    <span class="icon">📁</span>
+                    <span>الواجهة السابقة</span>
+                </button>
+                <button class="nav-item" onclick="switchTab('api-status')">
+                    <span class="icon">⚡</span>
+                    <span>حالة الخادم (API)</span>
+                </button>
+            </nav>
+        </aside>
+
+        <!-- المحتوى الرئيسي -->
+        <main class="main-content">
+            <!-- رأس الصفحة -->
+            <header class="top-bar">
+                <h1 id="page-title">الواجهة الحالية</h1>
+                <div class="server-badge" id="server-indicator">
+                    <span class="dot"></span> جاري التحقق من الخادم...
+                </div>
+            </header>
+
+            <!-- 1. قسم الواجهة الحالية -->
+            <section id="current-view" class="tab-content active">
+                <div class="card">
+                    <h3>العمليات والخدمات الحديثة</h3>
+                    <p>هذا القسم يحتوي على أدوات الإدارة والإدخال المحدثة.</p>
+                    <form id="action-form" onsubmit="handleFormSubmit(event)">
+                        <div class="form-group">
+                            <label for="serviceName">نوع الخدمة / الإجراء:</label>
+                            <input type="text" id="serviceName" required placeholder="مثال: صيانة تدفئة، تركيب مسبح...">
+                        </div>
+                        <button type="submit" class="btn btn-primary">إرسال للـ API</button>
+                    </form>
+                    <div id="form-response" class="response-box hidden"></div>
+                </div>
+            </section>
+
+            <!-- 2. قسم الواجهة السابقة (المدمج) -->
+            <section id="legacy-view" class="tab-content">
+                <div class="card">
+                    <h3>أدوات وسجلات الواجهة السابقة</h3>
+                    <p>تم دمج السجلات والأدوات القديمة هنا للحفاظ على سهولة الوصول للبيانات والوظائف السابقة.</p>
+                    <div class="data-table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>المعرف</th>
+                                    <th>العنصر / المهمة</th>
+                                    <th>الحالة</th>
+                                </tr>
+                            </thead>
+                            <tbody id="legacy-data-body">
+                                <tr>
+                                    <td>#101</td>
+                                    <td>فحص أنظمة التدفئة المركزية</td>
+                                    <td><span class="status completed">مكتمل</span></td>
+                                </tr>
+                                <tr>
+                                    <td>#102</td>
+                                    <td>توريد معدات المسابح</td>
+                                    <td><span class="status pending">قيد التنفيذ</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. قسم اختبار وفحص الـ API -->
+            <section id="api-status" class="tab-content">
+                <div class="card">
+                    <h3>فحص نقاط اتصال Express</h3>
+                    <p>اختبار استجابة الدوال في بيئة Vercel Serverless:</p>
+                    <button onclick="checkHealth()" class="btn btn-secondary">إعادة اختبار /api/health</button>
+                    <pre id="api-debug-output">جاري جلب البيانات...</pre>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="/js/app.js"></script>
+</body>
+</html>
+
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="utf-8" />
